@@ -103,6 +103,18 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+    var uniqs = {};
+    var uniqList = [];
+
+    _.each(array, function(val) {
+      uniqs[val] = val;
+    });
+
+    _.each(uniqs, function(elem) {
+      uniqList.push(elem);
+    });
+
+    return uniqList;
   };
 
 
