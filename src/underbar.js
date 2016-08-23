@@ -201,8 +201,8 @@
   _.every = function(collection, iterator) {
     iterator = iterator || _.identity;
     
-    return _.reduce(collection, function(item) {
-      return Boolean(iterator(item));
+    return _.reduce(collection, function(prev, curr) {
+      return Boolean(iterator(prev)) && Boolean(iterator(curr));
     }, true);
 
     // TIP: Try re-using reduce() here.
@@ -211,6 +211,11 @@
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
+    iterator = iterator || _.identity;
+    
+    return _.reduce(collection, function(prev, curr) {
+      return Boolean(iterator(prev)) || Boolean(iterator(curr));
+    }, false);
     // TIP: There's a very clever way to re-use every() here.
   };
 
