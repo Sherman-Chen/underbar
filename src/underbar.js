@@ -201,9 +201,9 @@
   _.every = function(collection, iterator) {
     iterator = iterator || _.identity;
     
-    return _.reduce(collection, function(prev, curr) {
-      return Boolean(iterator(prev)) && Boolean(iterator(curr));
-    }, true);
+    return Boolean(_.reduce(collection, function(prev, curr) {
+      return prev && iterator(curr);
+    }, true));
 
     // TIP: Try re-using reduce() here.
   };
@@ -213,9 +213,9 @@
   _.some = function(collection, iterator) {
     iterator = iterator || _.identity;
     
-    return _.reduce(collection, function(prev, curr) {
-      return Boolean(iterator(prev)) || Boolean(iterator(curr));
-    }, false);
+    return Boolean(_.reduce(collection, function(prev, curr) {
+      return prev || iterator(curr);
+    }, false));
     // TIP: There's a very clever way to re-use every() here.
   };
 
