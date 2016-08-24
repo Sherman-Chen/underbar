@@ -344,18 +344,30 @@
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
     var copy = array.slice();
-    var last = array.length - 1;
-    var temp;
-    var shuffle;
+    // var last = array.length - 1;
+    // var temp;
+    // var shuffle;
 
-    while (last) {
-      shuffle = Math.floor(Math.random() * last);
+    // while (last) {
+    //   shuffle = Math.floor(Math.random() * (last));
 
-      temp = copy[last];
-      copy[last] = copy[shuffle];
-      copy[shuffle] = temp;
+    //   temp = copy[last];
+    //   copy[last] = copy[shuffle];
+    //   copy[shuffle] = temp;
 
-      last--
+    //   last--
+    // }
+    // return copy;
+
+    //refactor, applys same concepts of Fisher-Yates algorithm
+
+    var i = copy.length, j,temp;
+
+    while (--i > 0) {
+      j = Math.floor(Math.random() * (i + 1));
+      temp = copy[j];
+      copy[j] = copy[i];
+      copy[i] = temp;
     }
     return copy;
   };
