@@ -307,7 +307,7 @@
 
     return function() {
       var results = JSON.stringify(arguments);
-      
+
       if (results in cache) {
         return cache[results];
       } else {
@@ -324,6 +324,11 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.prototype.slice.call(arguments, 2);
+
+    setTimeout(function() {
+      func.apply(null, args);
+    }, wait); 
   };
 
 
@@ -339,7 +344,6 @@
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
   };
-
 
   /**
    * ADVANCED
