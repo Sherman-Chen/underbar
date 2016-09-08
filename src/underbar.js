@@ -127,9 +127,14 @@
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
       var results = [];
-      for (var i = 0; i < collection.length; i++) {
-        results.push(iterator(collection[i]));
-      }
+      // for (var i = 0; i < collection.length; i++) {
+      //   results.push(iterator(collection[i]));
+      // }
+
+      _.each(collection, function(value, key, collection) {
+        results.push(iterator(value, key, collection));
+      });
+
       return results;
   };
 
@@ -172,13 +177,24 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-      if (accumulator === undefined) {
-        accumulator = collection[0];
-        collection = collection.slice(1);
-      }
+      // if (accumulator === undefined) {
+      //   accumulator = collection[0];
+      //   collection = collection.slice(1);
+      // }
 
-      _.each(collection, function(item) {
-        accumulator = iterator(accumulator, item);
+      // _.each(collection, function(item) {
+      //   accumulator = iterator(accumulator, item);
+      // });
+
+      var initializing = arguments.length === 2;
+
+      _.each(collection, function(value) {
+        if (initializing) {
+          accumulator = value;
+          initializing = false;
+        } else {
+          accumulator = iterator(accumulator, value);
+        }
       });
 
     return accumulator;
@@ -201,9 +217,13 @@
   _.every = function(collection, iterator) {
     iterator = iterator || _.identity;
     
-    return Boolean(_.reduce(collection, function(prev, curr) {
-      return prev && iterator(curr);
-    }, true));
+    // return Boolean(_.reduce(collection, function(prev, curr) {
+    //   return prev && iterator(curr);
+    // }, true));
+
+    return !!_.reduce(collection, function(isTrue, value) {
+      return isTrue && iterator(value);
+    }, true);
 
     // TIP: Try re-using reduce() here.
   };
@@ -213,9 +233,13 @@
   _.some = function(collection, iterator) {
     iterator = iterator || _.identity;
     
-    return Boolean(_.reduce(collection, function(prev, curr) {
-      return prev || iterator(curr);
-    }, false));
+    // return Boolean(_.reduce(collection, function(prev, curr) {
+    //   return prev || iterator(curr);
+    // }, false));
+
+      return !!_.reduce(collection, function(isTrue, value) {
+        return isTrue || iterator(value);
+      }, false);
     // TIP: There's a very clever way to re-use every() here.
   };
 
@@ -239,25 +263,36 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
-      for (var i = 0; i < arguments.length; i++) {
-        for (var key in arguments[i]) {
-          obj[key] = arguments[i][key];
-        }
-      }
+    //   for (var i = 0; i < arguments.length; i++) {
+    //     for (var key in arguments[i]) {
+    //       obj[key] = arguments[i][key];
+    //     }
+    //   }
 
+    _.each(arguments, function(source) {
+      _.each(source, function(value, key) {
+        obj[key] = value;
+      });
+    });
     return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
-    for (var i = 0; i < arguments.length; i++) {
-      for (var key in arguments[i]) {
-        if (obj[key] === undefined) {
-          obj[key] = arguments[i][key];
-        }
-      };
-    };
+    // for (var i = 0; i < arguments.length; i++) {
+    //   for (var key in arguments[i]) {
+    //     if (obj[key] === undefined) {
+    //       obj[key] = arguments[i][key];
+    //     }
+    //   };
+    // };
+
+    _.each(arguments, function(source) {
+      _.each(source, function(value, key) {
+        obj[key] === undefined && (obj[key] = value);
+      });
+    });
 
     return obj;
   };
@@ -305,16 +340,25 @@
   _.memoize = function(func) {
     var cache = {};
 
-    return function() {
-      var results = JSON.stringify(arguments);
+    // return function() {
+    //   var results = JSON.stringify(arguments);
 
-      if (results in cache) {
-        return cache[results];
-      } else {
-        return cache[results] = func.apply(null, arguments);
+    //   if (results in cache) {
+    //     return cache[results];
+    //   } else {
+    //     return cache[results] = func.apply(null, arguments);
+    //   }
+    //   return cache[results];
+    // }
+
+    return function() {
+      var arg = JSON.stringify(arguments);
+
+      if(!cache[arg]) {
+        cache[arg] = func.apply(this, arguments);
       }
-      return cache[results];
-    }
+      return cache[arg];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -383,6 +427,10 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+    return _.map(collection, function(item) {
+      var method = typeof functionOrKey === 'string' ? item[functionOrKey] : functionOrKey;
+      return method.apply(item, args);
+    });
   };
 
   // Sort the object's values by a criterion produced by an iterator.
